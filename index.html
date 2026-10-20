@@ -1,0 +1,21 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>房貸組合試算</title><link rel="stylesheet" href="style.css"></head><body>
+<h1>房貸組合試算</h1>
+<div id="cards" class="cards"></div>
+<div class="card"><h2>輸入條件</h2><div class="grid">
+<label>房貸總額（元）<input id="loan" type="number" value="5000000" step="100000"></label>
+<label>房貸利率（%）<input id="rate" type="number" value="2.2" step="0.05"></label>
+<label>房貸年期<select id="yrs"><option>20</option><option selected>30</option></select></label>
+<label>只繳息寬限期<select id="grace"><option value="0">無</option><option value="1">1年</option><option value="2">2年</option><option value="3">3年</option><option value="5">5年</option></select></label>
+<label>月配比例（%）<input id="ratio" type="number" value="60" min="0" max="100" step="5"></label>
+<label>月配年化配息率（%）<input id="yield" type="number" value="8" step="0.5"></label>
+<label>性別<select id="g"><option value="2" selected>女</option><option value="1">男</option></select></label>
+<label>年齡<input id="age" type="number" value="50" min="0" max="55"></label>
+<label>匯率（台幣/美元）<input id="fx" type="number" value="31" step="0.1"></label>
+</div><div id="msg" class="err"></div></div>
+<div class="card"><h2>① 每月現金流</h2><div id="cf"></div></div>
+<div class="card"><h2>② 富邦紅運優（PFNC，10年期）→ 第1年後減額繳清</h2><div id="pf"></div></div>
+<div class="card"><h2>③ 逐年明細</h2><button id="tg" type="button">展開逐年明細 ▾</button>
+<div id="tw" class="tw" style="display:none"><table><thead><tr><th>年度<br>(年齡)</th><th>PFNC解約金</th><th>累計生存金</th><th>PFNC身故保障</th><th>房貸餘額</th><th>基金本金＋身故<br>vs 房貸</th></tr></thead><tbody id="tb"></tbody></table></div></div>
+<p class="foot">紅利依中分紅情境試算，非保證；月配息率為假設，可能含本金配發；僅供參考，以正式建議書為準</p>
+<script src="pfnc_engine.js"></script><script src="app.js"></script></body></html>
