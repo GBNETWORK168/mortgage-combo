@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>房貸組合試算（互動版）</title>
+<link rel="stylesheet" href="interactive.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-text">
+      <p class="eyebrow">業務互動工具</p>
+      <h1>房貸組合試算</h1>
+      <p class="lead">調一下條件，房子就會跟著蓋起來。配息、月付和保障，用大數字一次看懂。</p>
+    </div>
+    <div class="topbar-actions">
+      <button type="button" id="btn-example" class="btn btn-ghost">套用範例</button>
+      <button type="button" id="btn-reset" class="btn btn-reset">一鍵重設</button>
+    </div>
+  </header>
+
+  <section class="scene-wrap" aria-label="互動房子">
+    <div class="scene-card">
+      <div class="scene-head">
+        <div>
+          <p class="scene-kicker" id="scene-year-label">第 1 年（50 歲）</p>
+          <p class="scene-title">看房子還了多少、保障蓋不蓋得住</p>
+        </div>
+        <div class="scene-chips">
+          <span class="chip" id="chip-cash">每月還多出 NT$0</span>
+          <span class="chip chip-alt" id="chip-cover">保障覆蓋 —</span>
+        </div>
+      </div>
+
+      <div class="scene-art">
+        <svg viewBox="0 0 720 430" class="house-svg" role="img" aria-labelledby="house-title">
+          <title id="house-title">會隨還款進度填色的房子，旁邊有保護傘</title>
+          <defs>
+            <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9EC9F0"/>
+              <stop offset="55%" stop-color="#E7F3FC"/>
+              <stop offset="100%" stop-color="#F8EFDA"/>
+            </linearGradient>
+            <linearGradient id="hillGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#8FCB6A"/>
+              <stop offset="100%" stop-color="#5EA04A"/>
+            </linearGradient>
+            <linearGradient id="roofGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#F07A58"/>
+              <stop offset="100%" stop-color="#C4452B"/>
+            </linearGradient>
+            <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FFF8EE"/>
+              <stop offset="100%" stop-color="#F3DFC4"/>
+            </linearGradient>
+            <pattern id="bricks" width="20" height="12" patternUnits="userSpaceOnUse">
+              <rect width="20" height="12" fill="#E3A16E"/>
+              <rect width="20" height="1.4" fill="#F8D4B0"/>
+              <rect y="6" width="9" height="1.4" fill="#F8D4B0"/>
+              <rect x="11" y="6" width="9" height="1.4" fill="#F8D4B0"/>
+              <rect x="9.3" y="6" width="1.5" height="6" fill="#F8D4B0"/>
+            </pattern>
+            <clipPath id="wallShape">
+              <rect x="248" y="188" width="204" height="148" rx="12"/>
+            </clipPath>
+            <linearGradient id="umbGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#3BB8A8"/>
+              <stop offset="100%" stop-color="#1F7F78"/>
+            </linearGradient>
+          </defs>
+
+          <rect width="720" height="430" fill="url(#skyGrad)"/>
+          <circle id="sun" cx="86" cy="72" r="28" fill="#F7D15A"/>
+          <circle id="sun-glow" cx="86" cy="72" r="42" fill="#F7D15A" opacity="0.25"/>
+          <g id="cloud-a" fill="#fff" opacity="0.9">
+            <ellipse cx="430" cy="64" rx="38" ry="18"/>
+            <ellipse cx="458" cy="70" rx="28" ry="14"/>
+            <ellipse cx="406" cy="72" rx="22" ry="12"/>
+          </g>
+          <g id="cloud-b" fill="#fff" opacity="0.75">
+            <ellipse cx="600" cy="96" rx="32" ry="15"/>
+            <ellipse cx="622" cy="102" rx="20" ry="11"/>
+          </g>
+
+          <path d="M0 318 C 120 286, 220 336, 360 308 C 500 280, 600 330, 720 300 L 720 430 L 0 430 Z" fill="url(#hillGrad)"/>
+          <path d="M0 360 C 160 340, 280 372, 430 350 C 560 332, 650 368, 720 350 L 720 430 L 0 430 Z" fill="#4E8F3F" opacity="0.55"/>
+
+          <!-- tree -->
+          <g id="tree" transform="translate(78,210)">
+            <rect x="26" y="86" width="12" height="52" rx="4" fill="#8A5A32"/>
+            <circle cx="32" cy="70" r="36" fill="#3F8F46"/>
+            <circle cx="12" cy="86" r="22" fill="#4FA24F"/>
+            <circle cx="52" cy="88" r="20" fill="#2F7A3C"/>
+          </g>
+
+          <!-- flowers -->
+          <g id="flowers" transform="translate(160,330)">
+            <circle cx="0" cy="8" r="5" fill="#E85D75"/>
+            <circle cx="18" cy="12" r="4" fill="#F4A4B4"/>
+            <circle cx="36" cy="8" r="5" fill="#EFC45A"/>
+            <rect x="-1" y="8" width="2" height="16" fill="#2F7A3C"/>
+            <rect x="17" y="12" width="2" height="14" fill="#2F7A3C"/>
+            <rect x="35" y="8" width="2" height="16" fill="#2F7A3C"/>
+          </g>
+
+          <!-- house shadow -->
+          <ellipse cx="350" cy="352" rx="128" ry="16" fill="#2A5A24" opacity="0.25"/>
+
+          <!-- chimney -->
+          <g id="chimney">
+            <rect x="412" y="128" width="28" height="62" rx="3" fill="#C56A55"/>
+            <rect x="406" y="120" width="40" height="12" rx="3" fill="#A84838"/>
+          </g>
+          <g id="smoke" class="is-off" fill="#fff" opacity="0.7">
+            <circle cx="426" cy="108" r="8"/>
+            <circle cx="438" cy="92" r="10"/>
+            <circle cx="422" cy="78" r="7"/>
+          </g>
+
+          <!-- roof -->
+          <g id="roof">
+            <polygon points="228,196 350,96 472,196" fill="url(#roofGrad)"/>
+            <polygon points="244,196 350,114 456,196" fill="#F4A08A" opacity="0.22"/>
+            <rect x="338" y="128" width="24" height="18" rx="3" fill="#6EC7E0"/>
+            <rect x="338" y="136" width="24" height="2" fill="#1B365D" opacity="0.25"/>
+            <rect x="349" y="128" width="2" height="18" fill="#1B365D" opacity="0.25"/>
+          </g>
+          <g id="roof-done" class="is-off">
+            <polygon points="228,196 350,96 472,196" fill="none" stroke="#F6D35A" stroke-width="5" opacity="0.85"/>
+          </g>
+
+          <!-- walls (empty then bricks fill from bottom) -->
+          <rect x="248" y="188" width="204" height="148" rx="12" fill="url(#wallGrad)" stroke="#E6C9A4" stroke-width="3"/>
+          <g clip-path="url(#wallShape)">
+            <rect id="brick-fill" x="248" y="336" width="204" height="0" fill="url(#bricks)"/>
+          </g>
+          <rect x="248" y="188" width="204" height="148" rx="12" fill="none" stroke="#D9B48A" stroke-width="3"/>
+
+          <!-- windows -->
+          <g id="windows">
+            <rect x="268" y="214" width="46" height="40" rx="6" fill="#7EC8E6" stroke="#8A5A32" stroke-width="4"/>
+            <rect x="268" y="232" width="46" height="3" fill="#8A5A32"/>
+            <rect x="289" y="214" width="4" height="40" fill="#8A5A32"/>
+            <rect x="386" y="214" width="46" height="40" rx="6" fill="#7EC8E6" stroke="#8A5A32" stroke-width="4"/>
+            <rect x="386" y="232" width="46" height="3" fill="#8A5A32"/>
+            <rect x="407" y="214" width="4" height="40" fill="#8A5A32"/>
+          </g>
+
+          <!-- door -->
+          <g id="door">
+            <rect x="326" y="262" width="48" height="74" rx="8" fill="#8B4A2B"/>
+            <circle cx="366" cy="302" r="4" fill="#F0C35A"/>
+            <rect x="340" y="274" width="20" height="16" rx="3" fill="#F6D9A8" opacity="0.45"/>
+          </g>
+
+          <!-- path -->
+          <path d="M326 336 L 374 336 L 430 430 L 270 430 Z" fill="#E7D0A0" opacity="0.9"/>
+
+          <!-- umbrella (protection) -->
+          <g id="umbrella" transform="translate(560,168)">
+            <path d="M0,-86 C 62,-86 96,-44 96,-8 L 0,-8 C 0,-8 -96,-8 -96,-8 C -96,-44 -62,-86 0,-86 Z" fill="url(#umbGrad)"/>
+            <path d="M0,-86 L 0,-8" stroke="#EAF8F4" stroke-width="3" opacity="0.45"/>
+            <path d="M-48,-86 Q -48,-18 -48,-8" fill="none" stroke="#EAF8F4" stroke-width="2" opacity="0.3"/>
+            <path d="M48,-86 Q 48,-18 48,-8" fill="none" stroke="#EAF8F4" stroke-width="2" opacity="0.3"/>
+            <rect x="-3" y="-8" width="6" height="110" rx="3" fill="#8A5A32"/>
+            <path d="M3,102 Q 22,118 18,128" fill="none" stroke="#8A5A32" stroke-width="6" stroke-linecap="round"/>
+            <circle id="umb-badge" cx="28" cy="-40" r="18" fill="#2E7D32"/>
+            <path id="umb-check" d="M20,-40 l6 7 12 -14" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+
+          <!-- coins (monthly surplus) -->
+          <g id="coins" transform="translate(500,300)">
+            <ellipse cx="18" cy="46" rx="30" ry="8" fill="#2A5A24" opacity="0.2"/>
+            <ellipse cx="18" cy="36" rx="20" ry="7" fill="#E8C04A" stroke="#C4921E" stroke-width="2"/>
+            <ellipse cx="18" cy="28" rx="20" ry="7" fill="#F0D36A" stroke="#C4921E" stroke-width="2"/>
+            <ellipse cx="18" cy="20" rx="20" ry="7" fill="#F6E08A" stroke="#C4921E" stroke-width="2"/>
+            <text x="18" y="24" text-anchor="middle" font-size="11" font-weight="700" fill="#8A5A12">$</text>
+          </g>
+        </svg>
+
+        <div class="scene-stats">
+          <div class="stat">
+            <span class="stat-label">已還掉的房貸</span>
+            <strong class="stat-value" id="stat-paid">0%</strong>
+            <em class="stat-sub" id="stat-bal">餘額 NT$0</em>
+          </div>
+          <div class="stat">
+            <span class="stat-label">基金本金＋身故金</span>
+            <strong class="stat-value" id="stat-cov">0 萬</strong>
+            <em class="stat-sub" id="stat-cov-vs">對上房貸餘額 —</em>
+          </div>
+          <div class="stat">
+            <span class="stat-label">保護傘覆蓋率</span>
+            <strong class="stat-value" id="stat-ratio">—</strong>
+            <em class="stat-sub" id="stat-ratio-note">身故當下能不能蓋住房貸</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="year-ctrl">
+        <label for="year-slider">走到第幾年看看</label>
+        <div class="year-row">
+          <input id="year-slider" type="range" min="1" max="30" value="1" step="1">
+          <input id="year-num" type="number" min="1" max="30" value="1" step="1" inputmode="numeric" aria-label="年度">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="steps" id="steps">
+    <article class="step-card" data-step="1">
+      <header class="step-h">
+        <span class="step-no">1</span>
+        <div>
+          <h2>房子與房貸</h2>
+          <p>先把房屋貸款條件填好</p>
+        </div>
+      </header>
+      <div class="field">
+        <div class="field-top">
+          <label for="loan">房貸總額（元）</label>
+          <strong class="field-big" id="loan-wan">500 萬</strong>
+        </div>
+        <div class="chips-row" id="loan-presets">
+          <button type="button" data-loan="3000000">300萬</button>
+          <button type="button" data-loan="5000000">500萬</button>
+          <button type="button" data-loan="8000000">800萬</button>
+          <button type="button" data-loan="10000000">1000萬</button>
+        </div>
+        <input id="loan-slider" type="range" min="1000000" max="30000000" step="100000" value="5000000" aria-label="房貸總額滑桿">
+        <input id="loan" type="number" value="5000000" step="100000" min="0" inputmode="numeric">
+      </div>
+      <div class="field">
+        <div class="field-top">
+          <label for="rate">房貸利率（%）</label>
+          <strong class="field-big" id="rate-view">2.2%</strong>
+        </div>
+        <input id="rate-slider" type="range" min="0.5" max="5" step="0.05" value="2.2" aria-label="房貸利率滑桿">
+        <input id="rate" type="number" value="2.2" step="0.05" min="0">
+      </div>
+      <div class="field">
+        <span class="field-label">房貸年期</span>
+        <div class="seg" id="yrs-seg" role="group" aria-label="房貸年期">
+          <button type="button" data-value="20">20 年</button>
+          <button type="button" data-value="30" class="on">30 年</button>
+        </div>
+        <select id="yrs" class="sr-only" aria-hidden="true" tabindex="-1">
+          <option>20</option>
+          <option selected>30</option>
+        </select>
+      </div>
+      <div class="field">
+        <span class="field-label">只繳息寬限期</span>
+        <div class="seg wrap" id="grace-seg" role="group" aria-label="只繳息寬限期">
+          <button type="button" data-value="0" class="on">無</button>
+          <button type="button" data-value="1">1年</button>
+          <button type="button" data-value="2">2年</button>
+          <button type="button" data-value="3">3年</button>
+          <button type="button" data-value="5">5年</button>
+        </div>
+        <select id="grace" class="sr-only" aria-hidden="true" tabindex="-1">
+          <option value="0" selected>無</option>
+          <option value="1">1年</option>
+          <option value="2">2年</option>
+          <option value="3">3年</option>
+          <option value="5">5年</option>
+        </select>
+      </div>
+    </article>
+
+    <article class="step-card" data-step="2">
+      <header class="step-h">
+        <span class="step-no">2</span>
+        <div>
+          <h2>月配怎麼排</h2>
+          <p>決定多少放月配、多少留給保障</p>
+        </div>
+      </header>
+      <div class="field">
+        <div class="field-top">
+          <label for="ratio">月配比例（%）</label>
+          <strong class="field-big" id="ratio-view">60%</strong>
+        </div>
+        <div class="split" aria-hidden="true">
+          <span class="split-a" id="split-a" style="width:60%">月配 60%</span>
+          <span class="split-b" id="split-b">保障 40%</span>
+        </div>
+        <input id="ratio-slider" type="range" min="0" max="100" step="5" value="60" aria-label="月配比例滑桿">
+        <input id="ratio" type="number" value="60" min="0" max="100" step="5">
+        <p class="hint" id="split-hint">月配本金 NT$3,000,000　保障預算 NT$2,000,000</p>
+      </div>
+      <div class="field">
+        <div class="field-top">
+          <label for="yield">月配年化配息率（%）</label>
+          <strong class="field-big" id="yield-view">8.0%</strong>
+        </div>
+        <input id="yield-slider" type="range" min="1" max="15" step="0.5" value="8" aria-label="月配年化配息率滑桿">
+        <input id="yield" type="number" value="8" step="0.5" min="0">
+        <p class="hint">這是假設配息率，實際配發可能包含本金。</p>
+      </div>
+    </article>
+
+    <article class="step-card" data-step="3">
+      <header class="step-h">
+        <span class="step-no">3</span>
+        <div>
+          <h2>保障給誰保</h2>
+          <p>紅運優（PFNC）10 年期，只繳第 1 年再減額繳清</p>
+        </div>
+      </header>
+      <div class="field">
+        <span class="field-label">性別</span>
+        <div class="seg" id="g-seg" role="group" aria-label="性別">
+          <button type="button" data-value="2" class="on">女</button>
+          <button type="button" data-value="1">男</button>
+        </div>
+        <select id="g" class="sr-only" aria-hidden="true" tabindex="-1">
+          <option value="2" selected>女</option>
+          <option value="1">男</option>
+        </select>
+      </div>
+      <div class="field">
+        <div class="field-top">
+          <label for="age">年齡</label>
+          <strong class="field-big" id="age-view">50 歲</strong>
+        </div>
+        <input id="age-slider" type="range" min="0" max="55" step="1" value="50" aria-label="年齡滑桿">
+        <input id="age" type="number" value="50" min="0" max="55" step="1" inputmode="numeric">
+      </div>
+      <div class="field">
+        <div class="field-top">
+          <label for="fx">匯率（台幣/美元）</label>
+          <strong class="field-big" id="fx-view">31.0</strong>
+        </div>
+        <input id="fx-slider" type="range" min="20" max="45" step="0.1" value="31" aria-label="匯率滑桿">
+        <input id="fx" type="number" value="31" step="0.1" min="0">
+      </div>
+    </article>
+  </section>
+
+  <p id="msg" class="err" role="alert"></p>
+
+  <section class="results">
+    <h2 class="block-title">試算結果</h2>
+    <div id="cards" class="cards"></div>
+    <div id="scripts" class="scripts"></div>
+  </section>
+
+  <section class="detail-grid">
+    <div class="card">
+      <h2>① 每月現金流</h2>
+      <div id="cf"></div>
+    </div>
+    <div class="card">
+      <h2>② 富邦紅運優（PFNC，10年期）→ 第1年後減額繳清</h2>
+      <div id="pf"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>③ 逐年明細</h2>
+    <button id="tg" type="button" class="btn">展開逐年明細 ▾</button>
+    <div id="tw" class="tw" style="display:none">
+      <table>
+        <thead>
+          <tr>
+            <th>年度<br>(年齡)</th>
+            <th>PFNC解約金</th>
+            <th>累計生存金</th>
+            <th>PFNC身故保障</th>
+            <th>房貸餘額</th>
+            <th>基金本金＋身故<br>vs 房貸</th>
+          </tr>
+        </thead>
+        <tbody id="tb"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="foot">數字依建議書中間情境試算，實際給付依公司核定；月配息率為假設，配發可能包含本金。實際條件以正式建議書為準。</p>
+  <pre id="result-json" class="sr-only" aria-hidden="true"></pre>
+
+  <script src="pfnc_engine.js"></script>
+  <script src="interactive.js"></script>
+</body>
+</html>
